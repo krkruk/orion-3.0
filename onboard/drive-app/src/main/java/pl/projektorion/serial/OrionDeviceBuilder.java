@@ -1,14 +1,17 @@
 package pl.projektorion.serial;
 
 import com.fazecast.jSerialComm.SerialPortMessageListener;
+import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.serializer.Serdes;
 
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 public class OrionDeviceBuilder<Command> {
 
     private final Class<Command> cmdClazz;
+    private SerialConfig config;
     private BlockingQueue<Command> commands;
     private Serdes<Command> commandSerdes;
 
@@ -18,6 +21,10 @@ public class OrionDeviceBuilder<Command> {
         this.cmdClazz = cmdClazz;
     }
 
+    public OrionDeviceBuilder<Command> withSerialConfig(final SerialConfig config) {
+        this.config = config;
+        return this;
+    }
 
     public OrionDeviceBuilder<Command> withCommandQueue(final BlockingQueue<Command> commands) {
         this.commands = commands;
@@ -36,6 +43,7 @@ public class OrionDeviceBuilder<Command> {
 
 
     public OrionDevice<Command> build() {
-        return new OrionDevice<>(commands, commandSerdes, listener);
+        Objects.requireNonNull(config, "Serial configuration must be provided");
+        return new OrionDevice<>(config, commands, commandSerdes, listener);
     }
 }

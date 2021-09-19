@@ -4,6 +4,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.serializer.Serdes;
 
 import java.util.Arrays;
@@ -12,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 public final class OrionDevice<Command> {
     private static final Logger log = LoggerFactory.getLogger(OrionDevice.class);
-    private static final String portName = "ttyACM0";
 
+    private final SerialConfig config;
     private final BlockingQueue<Command> commands;
     private final Serdes<Command> commandSerdes;
     private final SerialPortMessageListener listener;
@@ -21,12 +22,13 @@ public final class OrionDevice<Command> {
 
     private volatile boolean stopped = false;
 
-    OrionDevice(BlockingQueue<Command> commands, Serdes<Command> commandSerdes, SerialPortMessageListener listener) {
+    OrionDevice(SerialConfig config, BlockingQueue<Command> commands, Serdes<Command> commandSerdes, SerialPortMessageListener listener) {
+        this.config = config;
         this.commands = commands;
         this.commandSerdes = commandSerdes;
         this.listener = listener;
         this.port = Arrays.stream(SerialPort.getCommPorts())
-                .filter(p -> portName.equals(p.getSystemPortName()))
+                .filter(p -> config.getPortName().equals(p.getSystemPortName()))
                 .findFirst().orElse(null);
 
         initializeDevice();
@@ -36,9 +38,9 @@ public final class OrionDevice<Command> {
         return new OrionDeviceBuilder<>(commandClazz);
     }
 
-    public void setStopped(boolean stopped) {
+    public synchronized void toggleStop() {
+        this.stopped = !stopped;
         log.info("Serial device stop request received = {}", stopped);
-        this.stopped = stopped;
     }
 
     public void run() {
@@ -50,10 +52,14 @@ public final class OrionDevice<Command> {
         while (!stopped) {
             Command msg = null;
             try {
-                msg = commands.poll(500, TimeUnit.MILLISECONDS);
+                msg = commands.poll(config.getPollTimeout(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if (msg == null) {
+                continue;
+            }
+
             log.info("Serializing = {}", msg);
             try {
                 final byte[] serialized = commandSerdes.serialize(msg);
@@ -71,15 +77,15 @@ public final class OrionDevice<Command> {
             throw new IllegalStateException("No port detected");
         }
 
-        port.setBaudRate(115200);
-        port.setComPortTimeouts(200, 100, 100);
+        port.setBaudRate(config.getBaudRate());
+        port.setComPortTimeouts(config.getDefaultTimeout(), config.getReadTimeout(), config.getWriteTimeout());
         port.addDataListener(listener);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::gentleShutdown));
     }
 
     private void gentleShutdown() {
-        if (port != null) {
+        if (port != null && port.isOpen()) {
             port.removeDataListener();
             port.closePort();
             log.info("Serial port has been closed");
