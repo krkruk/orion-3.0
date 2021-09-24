@@ -1,8 +1,6 @@
 package pl.projektorion.config.network.subscriber;
 
 import pl.projektorion.config.CommandLineParser;
-import pl.projektorion.config.serial.SerialConfig;
-import pl.projektorion.config.serial.SerialConfigKeys;
 
 import java.util.Objects;
 import java.util.Properties;

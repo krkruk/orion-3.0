@@ -33,6 +33,6 @@ test {
 
 shadowJar {
     manifest {
-        attributes 'Main-Class': 'pl.projektorion.DriveApp'
+        attributes 'Main-Class': 'pl.projektorion.ControlApp'
     }
 }

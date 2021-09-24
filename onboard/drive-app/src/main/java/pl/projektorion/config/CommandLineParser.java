@@ -29,7 +29,9 @@ public class CommandLineParser {
     }
 
     public Properties getGlobalConfig() {
-        return properties.get(globalConfig);
+        final Properties globalProps = new Properties();
+        globalProps.putAll(properties.getOrDefault(globalConfig, new Properties()));
+        return globalProps;
     }
 
     private void initialize(final String[] args) {
@@ -39,7 +41,6 @@ public class CommandLineParser {
         }
 
         final String[] arguments = Arrays.copyOf(args, args.length);
-
         for (var arg : arguments)
             loadArgument(arg);
     }
