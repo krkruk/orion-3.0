@@ -59,7 +59,7 @@ public class DriveApp {
                 .withQueue(remoteCommands)
                 .build();
 
-        final ScheduledExecutorService commandGenerator = runPeriodically(device, subscriber);
+//        final ScheduledExecutorService commandGenerator = runPeriodically(device, subscriber);
 
         final Disposable telemetryObservable = telemetry.observe()
                 .subscribe(e -> log.info("Result = {}", e.toString()));
@@ -72,7 +72,7 @@ public class DriveApp {
 //        ioServices.submit(subscriber);
         subscriber.run();
 
-        commandGenerator.shutdown();
+//        commandGenerator.shutdown();
         telemetryObservable.dispose();
         subscribeObservable.dispose();
         ioServices.shutdown();
