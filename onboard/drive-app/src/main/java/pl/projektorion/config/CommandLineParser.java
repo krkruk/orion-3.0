@@ -29,8 +29,8 @@ public class CommandLineParser {
     }
 
     public Properties getGlobalConfig() {
+        assert properties.containsKey(globalConfig) : "Required '" + globalConfig + "' configuration flag";
         final Properties globalProps = new Properties();
-        log.info("All properties = {}", properties);
         globalProps.putAll(properties.getOrDefault(globalConfig, new Properties()));
         return globalProps;
     }
