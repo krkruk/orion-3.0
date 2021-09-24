@@ -12,7 +12,6 @@ public class SerialConfigLoader {
 
     public static SerialConfig get(final CommandLineParser cmdArgs) {
         final Properties globalConfig = cmdArgs.getGlobalConfig();
-        log.info("Global config = {}", globalConfig);
         Objects.requireNonNull(globalConfig, "Configuration cannot be null");
         validateKeys(globalConfig);
 
