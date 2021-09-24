@@ -41,8 +41,9 @@ public class CommandLineParser {
         }
 
         final String[] arguments = Arrays.copyOf(args, args.length);
-        for (var arg : arguments)
+        for (var arg : arguments) {
             loadArgument(arg);
+        }
     }
 
     private void loadArgument(final String argument) {
@@ -61,7 +62,7 @@ public class CommandLineParser {
             log.error("Cannot load {}={}", key, file);
             throw new IllegalStateException("Cannot load property file.", e);
         }
-        log.info("Properties {}={}", split[0], props);
-        this.properties.put(split[0], props);
+        log.info("Properties {}={}", key, props);
+        this.properties.put(key, props);
     }
 }
