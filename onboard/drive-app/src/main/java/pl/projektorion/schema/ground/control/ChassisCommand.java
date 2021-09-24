@@ -1,17 +1,17 @@
-package pl.projektorion.hardware.chassis;
+package pl.projektorion.schema.ground.control;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChassisCommandMessage {
+public class ChassisCommand {
 
     private int x;
     private int y;
 
-    public ChassisCommandMessage() {
+    public ChassisCommand() {
     }
 
-    public ChassisCommandMessage(int x, int y) {
+    public ChassisCommand(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -34,7 +34,7 @@ public class ChassisCommandMessage {
 
     @Override
     public String toString() {
-        return "ChassisCommandMessage{" +
+        return "ChassisCommand{" +
                 "x=" + x +
                 ", y=" + y +
                 '}';

@@ -1,4 +1,4 @@
-package pl.projektorion.hardware.chassis;
+package pl.projektorion.schema.hardware.chassis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

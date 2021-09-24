@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public final class OrionDevice<Command> {
+public final class OrionDevice<Command> implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(OrionDevice.class);
 
     private final SerialConfig config;
@@ -43,6 +43,7 @@ public final class OrionDevice<Command> {
         log.info("Serial device stop request received = {}", stopped);
     }
 
+    @Override
     public void run() {
         if (!port.openPort()) {
             throw new IllegalStateException("Could not open the port");
