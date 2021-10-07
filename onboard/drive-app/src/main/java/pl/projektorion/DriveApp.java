@@ -5,6 +5,7 @@ import io.reactivex.rxjava3.observables.ConnectableObservable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.projektorion.chassis.ChassisCommandMapperOpenLoop;
+import pl.projektorion.chassis.ChassisTelemetryListener;
 import pl.projektorion.config.CommandLineParser;
 import pl.projektorion.config.network.publisher.PublisherConfig;
 import pl.projektorion.config.network.publisher.PublisherConfigLoader;
@@ -18,10 +19,10 @@ import pl.projektorion.network.subscriber.NetworkSubscriber;
 import pl.projektorion.rx.utils.ObservableQueue;
 import pl.projektorion.schema.ground.control.ChassisCommand;
 import pl.projektorion.schema.hardware.chassis.ChassisCommandMessageOpenLoop;
-import pl.projektorion.chassis.ChassisTelemetryListener;
 import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionDevice;
 import pl.projektorion.serial.OrionJsonSerdes;
+import pl.projektorion.utils.QueueFactory;
 
 import java.util.concurrent.*;
 
@@ -38,10 +39,10 @@ public class DriveApp {
 
         final ExecutorService ioServices = Executors.newFixedThreadPool(3);
 
-        final ObservableQueue<ChassisCommand> commandReceiver = new ObservableQueue<>();
-        final BlockingQueue<ChassisCommandMessageOpenLoop> commandSender = new LinkedBlockingQueue<>();
-        final ObservableQueue<ChassisTelemetryMessage> telemetryReceiver = new ObservableQueue<>();
-        final BlockingQueue<ChassisTelemetryMessage> telemetrySender = new LinkedBlockingQueue<>();
+        final ObservableQueue<ChassisCommand> commandReceiver = QueueFactory.createReceiverQueue();
+        final BlockingQueue<ChassisCommandMessageOpenLoop> commandSender = QueueFactory.createSenderQueue();
+        final ObservableQueue<ChassisTelemetryMessage> telemetryReceiver = QueueFactory.createReceiverQueue();
+        final BlockingQueue<ChassisTelemetryMessage> telemetrySender = QueueFactory.createSenderQueue();
 
         final OrionDevice<ChassisCommandMessageOpenLoop> device = OrionDevice.builder(ChassisCommandMessageOpenLoop.class)
                 .withSerialConfig(serialConfig)
