@@ -67,8 +67,8 @@ public class OrionSerialNetworkGateway<NetRx, SerialTx, SerialRx, NetTx> impleme
             this.netTxClass = netTxClass;
         }
 
-        public BasicNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> basic() {
-            return new BasicNetworkGatewayBuilder<>(netRxClass, serialTxClass, serialRxClass, netTxClass);
+        public BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> basic() {
+            return new BasicSerialNetworkGatewayBuilder<>(netRxClass, serialTxClass, serialRxClass, netTxClass);
         }
 
         public SerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> customizable() {

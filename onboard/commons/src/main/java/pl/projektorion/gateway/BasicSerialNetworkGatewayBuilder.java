@@ -4,11 +4,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observables.ConnectableObservable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.gateway.publisher.BasicPublisherGatewayBuilder;
 import pl.projektorion.gateway.publisher.PublisherBuilderArgs;
-import pl.projektorion.gateway.serial.BasicSerialGatewayBuilder;
 import pl.projektorion.gateway.serial.SerialBuilderArgs;
-import pl.projektorion.gateway.subscriber.BasicSubscriberGatewayBuilder;
 import pl.projektorion.gateway.subscriber.SubscriberBuilderArgs;
 import pl.projektorion.network.Network;
 import pl.projektorion.network.publisher.NetworkPublisher;
@@ -21,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class BasicNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> implements SerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> {
-    private static final Logger log = LoggerFactory.getLogger(BasicNetworkGatewayBuilder.class);
+public class BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> implements SerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> {
+    private static final Logger log = LoggerFactory.getLogger(BasicSerialNetworkGatewayBuilder.class);
 
     private final Class<NetRx> netRxClass;
     private final Class<SerialTx> serialTxClass;
@@ -40,7 +37,7 @@ public class BasicNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> implem
 
     private final List<Disposable> disposables;
 
-    BasicNetworkGatewayBuilder(Class<NetRx> netRxClass, Class<SerialTx> serialTxClass, Class<SerialRx> serialRxClass, Class<NetTx> netTxClass) {
+    BasicSerialNetworkGatewayBuilder(Class<NetRx> netRxClass, Class<SerialTx> serialTxClass, Class<SerialRx> serialRxClass, Class<NetTx> netTxClass) {
         this.netRxClass = netRxClass;
         this.serialTxClass = serialTxClass;
         this.serialRxClass = serialRxClass;
@@ -109,15 +106,15 @@ public class BasicNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> implem
         disposables.forEach(Disposable::dispose);
     }
 
-    public void setSerial(BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> serial) {
+    void setSerial(BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> serial) {
         this.serial = serial;
     }
 
-    public void setSubscriber(BasicSubscriberGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> subscriber) {
+    void setSubscriber(BasicSubscriberGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> subscriber) {
         this.sub = subscriber;
     }
 
-    public void setPublisher(BasicPublisherGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> publisher) {
+    void setPublisher(BasicPublisherGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> publisher) {
         this.pub = publisher;
     }
 }

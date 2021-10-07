@@ -1,8 +1,10 @@
-package pl.projektorion.gateway.serial;
+package pl.projektorion.gateway;
 
 import pl.projektorion.config.serial.SerialConfig;
-import pl.projektorion.gateway.BasicNetworkGatewayBuilder;
-import pl.projektorion.gateway.SerialNetworkGatewayBuilder;
+import pl.projektorion.gateway.serial.SerialApplyBuilderArg;
+import pl.projektorion.gateway.serial.SerialBuilderArgs;
+import pl.projektorion.gateway.serial.SerialListenerBuilderArg;
+import pl.projektorion.gateway.serial.SerialSerdesBuilderArg;
 import pl.projektorion.serial.OrionDeviceListener;
 import pl.projektorion.serializer.Serdes;
 
@@ -26,8 +28,8 @@ public class BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>
         Objects.requireNonNull(config, "SerialConfig must be provided");
         Objects.requireNonNull(txSerdes, "Tx Serdes is mandatory to send messages to the microcontroller");
         Objects.requireNonNull(rxSerdes, "Rx Serdes is mandatory to receive messages from the microcontroller");
-        assert (rootBuilder instanceof BasicNetworkGatewayBuilder) : "BasicSerialGatewayBuilder requires a corresponding BasicNetworkGatewayBuilder instance";
-        ((BasicNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>) rootBuilder).setSerial(this);
+        assert (rootBuilder instanceof BasicSerialNetworkGatewayBuilder) : "BasicSerialGatewayBuilder requires a corresponding BasicNetworkGatewayBuilder instance";
+        ((BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>) rootBuilder).setSerial(this);
         return rootBuilder;
     }
 
