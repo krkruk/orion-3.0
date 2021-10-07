@@ -34,7 +34,7 @@ public abstract class OrionDeviceListener<Msg> implements SerialPortMessageListe
     public void serialEvent(SerialPortEvent event) {
         final byte[] line = event.getReceivedData();
         try {
-            log.trace("Received serial {} message = {}", event.getSerialPort(), new String(line));
+            log.debug("Received serial {} message = {}", event.getSerialPort(), new String(line));
             final Msg message = serdes.deserialize(line);
             processMessage(message);
         } catch (Exception e) {

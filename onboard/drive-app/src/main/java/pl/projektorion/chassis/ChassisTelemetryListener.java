@@ -24,7 +24,7 @@ public class ChassisTelemetryListener extends OrionDeviceListener<ChassisTelemet
 
     @Override
     protected void processMessage(ChassisTelemetryMessage incomingMessage) {
-        log.trace("Received telemetry = {}", incomingMessage);
+        log.debug("Received telemetry = {}", incomingMessage);
         queue.add(incomingMessage);
     }
 

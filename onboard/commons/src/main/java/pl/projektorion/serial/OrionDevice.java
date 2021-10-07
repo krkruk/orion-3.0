@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 public final class OrionDevice<Command> implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(OrionDevice.class);
 
+    private final Class<Command> clazz;
     private final SerialConfig config;
     private final BlockingQueue<Command> commands;
     private final Serdes<Command> commandSerdes;
@@ -22,7 +23,12 @@ public final class OrionDevice<Command> implements Runnable {
 
     private volatile boolean stopped = false;
 
-    OrionDevice(SerialConfig config, BlockingQueue<Command> commands, Serdes<Command> commandSerdes, SerialPortMessageListener listener) {
+    OrionDevice(Class<Command> clazz,
+                SerialConfig config,
+                BlockingQueue<Command> commands,
+                Serdes<Command> commandSerdes,
+                SerialPortMessageListener listener) {
+        this.clazz = clazz;
         this.config = config;
         this.commands = commands;
         this.commandSerdes = commandSerdes;
@@ -49,7 +55,7 @@ public final class OrionDevice<Command> implements Runnable {
             throw new IllegalStateException("Could not open the port");
         }
 
-        log.info("Running device...");
+        log.info("About to start sending {} messages to the serial device...", clazz.getCanonicalName());
         while (!Thread.currentThread().isInterrupted() && !stopped) {
             Command msg = null;
             try {
@@ -61,7 +67,7 @@ public final class OrionDevice<Command> implements Runnable {
                 continue;
             }
 
-            log.trace("Serializing = {}", msg);
+            log.debug("About to serialize a serial message: {}", msg);
             try {
                 final byte[] serialized = commandSerdes.serialize(msg);
                 port.writeBytes(serialized, serialized.length);

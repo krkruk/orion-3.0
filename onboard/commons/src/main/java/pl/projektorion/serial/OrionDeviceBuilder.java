@@ -5,7 +5,6 @@ import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.serializer.Serdes;
 
 import java.util.Objects;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 public class OrionDeviceBuilder<Command> {
@@ -44,6 +43,6 @@ public class OrionDeviceBuilder<Command> {
 
     public OrionDevice<Command> build() {
         Objects.requireNonNull(config, "Serial configuration must be provided");
-        return new OrionDevice<>(config, commands, commandSerdes, listener);
+        return new OrionDevice<>(cmdClazz, config, commands, commandSerdes, listener);
     }
 }

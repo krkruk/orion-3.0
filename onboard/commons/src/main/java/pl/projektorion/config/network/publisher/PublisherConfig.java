@@ -27,10 +27,6 @@ public class PublisherConfig {
         return Integer.parseInt(this.properties.getOrDefault(PublisherConfigKeys.POLL_TIMEOUT, defaultTimeout()).toString());
     }
 
-    public String getTopic() {
-        return this.properties.getOrDefault(PublisherConfigKeys.TOPIC, "").toString();
-    }
-
     private String defaultTimeout() {
         return this.properties.getOrDefault(PublisherConfigKeys.DEFAULT_TIMEOUT, "50").toString();
     }
@@ -50,7 +46,6 @@ public class PublisherConfig {
                 "receiver.address=" + getReceiverAddress() +
                 ", defaultTimeout=" + getDefaultTimeout() +
                 ", readTimeout=" + getPollTimeout() +
-                ", topic=" + getTopic() +
                 '}';
     }
 }

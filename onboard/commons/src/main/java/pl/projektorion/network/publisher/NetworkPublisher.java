@@ -49,7 +49,7 @@ public class NetworkPublisher<T> implements Runnable {
 
                 try {
                     final byte[] message = serdes.serialize(msg);
-                    log.trace("Sending to the upstream: {}", msg);
+                    log.debug("Sending to the upstream: {}", msg);
                     sender.send(message);
                 } catch (Exception e) {
                     log.warn("Cannot send a message {} to {}", msg, config.getReceiverAddress());

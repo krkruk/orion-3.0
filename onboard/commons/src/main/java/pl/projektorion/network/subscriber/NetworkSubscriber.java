@@ -46,7 +46,7 @@ public class NetworkSubscriber<T> implements Runnable {
                 final String commandMsg = receiver.recvStr();
                 // process
                 if (commandMsg != null) {
-                    log.trace("Received remote message = {}", commandMsg);
+                    log.debug("Received remote message = {}", commandMsg);
                     try {
                         final T deserialize = serdes.deserialize(commandMsg.getBytes(StandardCharsets.UTF_8));
                         queue.add(deserialize);

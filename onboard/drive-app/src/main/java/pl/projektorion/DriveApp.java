@@ -68,7 +68,7 @@ public class DriveApp {
 //        final ScheduledExecutorService commandGenerator = runPeriodically(device, subscriber);
 
         final ConnectableObservable<ChassisTelemetryMessage> publisherObservable = telemetryReceiver.observe().publish();
-//        final Disposable localTelemetry = publisherObservable.subscribe(e -> log.info("Result = {}", e.toString()));
+        final Disposable localTelemetry = publisherObservable.subscribe(e -> log.info("Result = {}", e.toString()));
         final Disposable remoteTelemetry = publisherObservable.subscribe(telemetrySender::add);
         final Disposable connect = publisherObservable.connect();
 
@@ -83,7 +83,7 @@ public class DriveApp {
 
 //        commandGenerator.shutdown();
         remoteTelemetry.dispose();
-//        localTelemetry.dispose();
+        localTelemetry.dispose();
         connect.dispose();
         subscribeObservable.dispose();
         ioServices.shutdown();

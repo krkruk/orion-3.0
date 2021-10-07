@@ -8,7 +8,6 @@ public interface PublisherConfigKeys {
 
     String RECEIVER_ADDRESS = "receiver.address";
     String POLL_TIMEOUT = "poll.timeout";
-    String TOPIC = "topic";
     String DEFAULT_TIMEOUT = "timeout";
 
     Set<String> MANDATORY_KEYS = Set.of(RECEIVER_ADDRESS, POLL_TIMEOUT);

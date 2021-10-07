@@ -4,7 +4,6 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
-import javax.naming.OperationNotSupportedException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
