@@ -1,0 +1,30 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
+}
+
+group 'pl.projektorion'
+version '1.0-SNAPSHOT'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.zeromq:jeromq:0.5.2'
+    implementation 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
+    implementation 'com.github.oshi:oshi-core:5.+'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.+'
+    implementation "io.reactivex.rxjava3:rxjava:3.+"
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    implementation 'org.slf4j:slf4j-simple:1.7.30'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -37,7 +37,7 @@ public class CommandLineParser {
 
     private void initialize(final String[] args) {
         if (args.length == 0) {
-            log.info("No command line arguments specified.");
+            log.error("No command line arguments specified. Use {}=your_config_name.properties to specify the config.", globalConfig);
             return;
         }
 

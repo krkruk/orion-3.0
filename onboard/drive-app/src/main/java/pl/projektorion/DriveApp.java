@@ -3,9 +3,6 @@ package pl.projektorion;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.SocketType;
-import org.zeromq.ZContext;
-import org.zeromq.ZMQ;
 import pl.projektorion.chassis.ChassisCommandMapperOpenLoop;
 import pl.projektorion.config.CommandLineParser;
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
@@ -21,10 +18,7 @@ import pl.projektorion.schema.hardware.chassis.ChassisTelemetryListener;
 import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionDevice;
 import pl.projektorion.serial.OrionJsonSerdes;
-import pl.projektorion.serializer.Serdes;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.concurrent.*;
 
 public class DriveApp {
