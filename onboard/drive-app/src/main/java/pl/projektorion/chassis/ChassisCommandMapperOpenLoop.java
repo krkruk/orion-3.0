@@ -8,6 +8,8 @@ public class ChassisCommandMapperOpenLoop implements Function<ChassisCommand, Ch
 
     @Override
     public ChassisCommandMessageOpenLoop apply(ChassisCommand chassisCommand) throws Throwable {
-        return new ChassisCommandMessageOpenLoop(chassisCommand.getX(), chassisCommand.getY());
+        return new ChassisCommandMessageOpenLoop(
+                (short) chassisCommand.getTwist().getSpeed(),
+                (short) chassisCommand.getTwist().getAngle());
     }
 }

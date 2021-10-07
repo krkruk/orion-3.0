@@ -1,20 +1,24 @@
 package pl.projektorion;
 
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observables.ConnectableObservable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.projektorion.chassis.ChassisCommandMapperOpenLoop;
 import pl.projektorion.config.CommandLineParser;
+import pl.projektorion.config.network.publisher.PublisherConfig;
+import pl.projektorion.config.network.publisher.PublisherConfigLoader;
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
 import pl.projektorion.config.network.subscriber.SubscriberConfigLoader;
 import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.config.serial.SerialConfigLoader;
 import pl.projektorion.network.Network;
-import pl.projektorion.network.NetworkSubscriber;
+import pl.projektorion.network.publisher.NetworkPublisher;
+import pl.projektorion.network.subscriber.NetworkSubscriber;
 import pl.projektorion.rx.utils.ObservableQueue;
 import pl.projektorion.schema.ground.control.ChassisCommand;
 import pl.projektorion.schema.hardware.chassis.ChassisCommandMessageOpenLoop;
-import pl.projektorion.schema.hardware.chassis.ChassisTelemetryListener;
+import pl.projektorion.chassis.ChassisTelemetryListener;
 import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionDevice;
 import pl.projektorion.serial.OrionJsonSerdes;
@@ -28,50 +32,61 @@ public class DriveApp {
         final CommandLineParser cmdArgs = CommandLineParser.parse(args);
         final SerialConfig serialConfig = SerialConfigLoader.get(cmdArgs);
         final SubscriberConfig subscriberConfig = SubscriberConfigLoader.get(cmdArgs);
+        final PublisherConfig publisherConfig = PublisherConfigLoader.get(cmdArgs);
         log.info("Serial props = {}", serialConfig);
         log.info("Subscriber props = {}", subscriberConfig);
 
-        final ExecutorService ioServices = Executors.newFixedThreadPool(2);
+        final ExecutorService ioServices = Executors.newFixedThreadPool(3);
 
-        final ObservableQueue<ChassisCommand> remoteCommands = new ObservableQueue<>();
-        final BlockingQueue<ChassisCommandMessageOpenLoop> commands = new LinkedBlockingQueue<>();
-        final ObservableQueue<ChassisTelemetryMessage> telemetry = new ObservableQueue<>();
+        final ObservableQueue<ChassisCommand> commandReceiver = new ObservableQueue<>();
+        final BlockingQueue<ChassisCommandMessageOpenLoop> commandSender = new LinkedBlockingQueue<>();
+        final ObservableQueue<ChassisTelemetryMessage> telemetryReceiver = new ObservableQueue<>();
+        final BlockingQueue<ChassisTelemetryMessage> telemetrySender = new LinkedBlockingQueue<>();
 
         final OrionDevice<ChassisCommandMessageOpenLoop> device = OrionDevice.builder(ChassisCommandMessageOpenLoop.class)
                 .withSerialConfig(serialConfig)
-                .withCommandQueue(commands)
+                .withCommandQueue(commandSender)
                 .withCommandSerdes(new OrionJsonSerdes<>(ChassisCommandMessageOpenLoop.class))
                 .withTelemetryListener(ChassisTelemetryListener.builder()
                         .withSerdes(new OrionJsonSerdes<>(ChassisTelemetryMessage.class))
-                        .withQueue(telemetry)
+                        .withQueue(telemetryReceiver)
                         .build())
                 .build();
 
         final NetworkSubscriber<ChassisCommand> subscriber = Network.subscriber(ChassisCommand.class)
                 .withConfig(subscriberConfig)
                 .withSerdes(new OrionJsonSerdes<>(ChassisCommand.class))
-                .withQueue(remoteCommands)
+                .withQueue(commandReceiver)
+                .build();
+
+        final NetworkPublisher<ChassisTelemetryMessage> publisher = Network.publisher(ChassisTelemetryMessage.class)
+                .withConfig(publisherConfig)
+                .withSerdes(new OrionJsonSerdes<>(ChassisTelemetryMessage.class))
+                .withQueue(telemetrySender)
                 .build();
 
 //        final ScheduledExecutorService commandGenerator = runPeriodically(device, subscriber);
 
-        final Disposable telemetryObservable = telemetry.observe()
-                .subscribe(e -> log.info("Result = {}", e.toString()));
+        final ConnectableObservable<ChassisTelemetryMessage> publisherObservable = telemetryReceiver.observe().publish();
+//        final Disposable localTelemetry = publisherObservable.subscribe(e -> log.info("Result = {}", e.toString()));
+        final Disposable remoteTelemetry = publisherObservable.subscribe(telemetrySender::add);
+        final Disposable connect = publisherObservable.connect();
 
-        final Disposable subscribeObservable = remoteCommands.observe()
+        final Disposable subscribeObservable = commandReceiver.observe()
                 .map(new ChassisCommandMapperOpenLoop())
-                .subscribe(commands::add);
+                .subscribe(commandSender::add);
 
-        ioServices.submit(device);
-//        ioServices.submit(subscriber);
-        subscriber.run();
+        ioServices.submit(subscriber);
+        ioServices.submit(publisher);
+
+        device.run();
 
 //        commandGenerator.shutdown();
-        telemetryObservable.dispose();
+        remoteTelemetry.dispose();
+//        localTelemetry.dispose();
+        connect.dispose();
         subscribeObservable.dispose();
         ioServices.shutdown();
-        log.info("Total amount of received msgs = {}", telemetry.size());
-
     }
 
     private static ScheduledExecutorService runPeriodically(OrionDevice<ChassisCommandMessageOpenLoop> device,

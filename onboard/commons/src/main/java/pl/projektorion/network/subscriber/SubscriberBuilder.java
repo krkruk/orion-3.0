@@ -1,4 +1,4 @@
-package pl.projektorion.network;
+package pl.projektorion.network.subscriber;
 
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
 import pl.projektorion.serializer.Serdes;
@@ -12,7 +12,7 @@ public class SubscriberBuilder<T> {
     private Serdes<T> serdes;
     private Queue<T> queue;
 
-    SubscriberBuilder(Class<T> clazz) {
+    public SubscriberBuilder(Class<T> clazz) {
         this.clazz = clazz;
     }
 

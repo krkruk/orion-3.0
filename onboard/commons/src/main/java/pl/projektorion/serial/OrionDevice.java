@@ -50,18 +50,18 @@ public final class OrionDevice<Command> implements Runnable {
         }
 
         log.info("Running device...");
-        while (!stopped) {
+        while (!Thread.currentThread().isInterrupted() && !stopped) {
             Command msg = null;
             try {
                 msg = commands.poll(config.getPollTimeout(), TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("Error = {}", e.getMessage());
             }
             if (msg == null) {
                 continue;
             }
 
-            log.info("Serializing = {}", msg);
+            log.trace("Serializing = {}", msg);
             try {
                 final byte[] serialized = commandSerdes.serialize(msg);
                 port.writeBytes(serialized, serialized.length);

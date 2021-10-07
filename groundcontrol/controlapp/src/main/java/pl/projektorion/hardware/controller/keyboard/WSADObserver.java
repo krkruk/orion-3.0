@@ -1,7 +1,9 @@
 package pl.projektorion.hardware.controller.keyboard;
 
+import pl.projektorion.schema.Twist;
+import pl.projektorion.schema.ground.control.ChassisCommand;
+
 import java.time.Instant;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -43,7 +45,7 @@ public class WSADObserver {
     }
 
     public ChassisCommand state() {
-        return new ChassisCommand(ahead, sideways);
+        return new ChassisCommand(new Twist(ahead, sideways));
     }
 
     private synchronized void process() {

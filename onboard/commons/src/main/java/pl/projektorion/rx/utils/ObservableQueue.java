@@ -60,6 +60,7 @@ public class ObservableQueue<T> implements BlockingQueue<T>, Closeable {
 
     @Override
     public T poll(long l, TimeUnit timeUnit) throws InterruptedException {
+        Thread.sleep(timeUnit.toMillis(l));
         throw null;
     }
 

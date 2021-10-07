@@ -1,7 +1,8 @@
-package pl.projektorion.schema.hardware.chassis;
+package pl.projektorion.chassis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionDeviceListener;
 import pl.projektorion.serializer.Serdes;
 

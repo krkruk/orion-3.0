@@ -1,4 +1,4 @@
-package pl.projektorion.network;
+package pl.projektorion.network.subscriber;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,8 +6,6 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
-import pl.projektorion.schema.ground.control.ChassisCommand;
-import pl.projektorion.serial.OrionJsonSerdes;
 import pl.projektorion.serializer.Serdes;
 
 import java.nio.charset.StandardCharsets;
@@ -36,12 +34,14 @@ public class NetworkSubscriber<T> implements Runnable {
 
     @Override
     public void run() {
+        log.info("Preparing NetworkSubscriber...");
         try (ZContext ctx = new ZContext()) {
             final ZMQ.Socket receiver = ctx.createSocket(SocketType.SUB);
             receiver.bind(config.getBindAddress());
             receiver.subscribe(config.getTopic());
             receiver.setReceiveTimeOut(config.getReadTimeout());
 
+            log.info("About to start receiving {} messages from the upstream.", clazz.getCanonicalName());
             while (!Thread.currentThread().isInterrupted() && !stopped) {
                 final String commandMsg = receiver.recvStr();
                 // process
