@@ -40,7 +40,7 @@ public class SubscriberConfig {
     static SubscriberConfig build(Properties props) {
         Properties properties = new Properties();
         properties.putAll(props);
-        properties = stripPrefix(SubscriberConfigKeys.PREFIX, properties);
+        properties = stripPrefix(SubscriberConfigKeys.PREFIXED, properties);
 
         log.info("Loaded Network Subscriber config = {}", properties);
         return new SubscriberConfig(properties);

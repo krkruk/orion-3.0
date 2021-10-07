@@ -3,7 +3,8 @@ package pl.projektorion.config.serial;
 import java.util.Set;
 
 public interface SerialConfigKeys {
-    String PREFIX = "serial.";
+    String PREFIX = "serial";
+    String PREFIXED = PREFIX + ".";
 
     String PORT_NAME = "port.name";
     String BAUD_RATE = "baudrate";

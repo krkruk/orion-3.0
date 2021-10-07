@@ -48,7 +48,7 @@ public class SerialConfig {
     static SerialConfig build(Properties props) {
         Properties properties = new Properties();
         properties.putAll(props);
-        properties = stripPrefix(SerialConfigKeys.PREFIX, properties);
+        properties = stripPrefix(SerialConfigKeys.PREFIXED, properties);
 
         log.info("Loaded serial config = {}", properties);
         return new SerialConfig(properties);
