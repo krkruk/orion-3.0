@@ -16,6 +16,7 @@ import pl.projektorion.utils.QueueFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 public class BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> implements SerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> {
@@ -62,6 +63,10 @@ public class BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> 
 
     @Override
     public Runnable build() {
+        Objects.requireNonNull(serial, "Serial configuration must be defined!. Run ::serial() to specify configuration accordingly");
+        Objects.requireNonNull(sub, "NetworkSubscriber configuration must be defined!. Run ::subscriber() to specify configuration accordingly");
+        Objects.requireNonNull(pub, "NetworkSubscriber configuration must be defined!. Run ::publisher() to specify configuration accordingly");
+
         final OrionDevice<SerialTx> device = OrionDevice.builder(serialTxClass)
                 .withSerialConfig(serial.getConfig())
                 .withCommandQueue(commandSender)
