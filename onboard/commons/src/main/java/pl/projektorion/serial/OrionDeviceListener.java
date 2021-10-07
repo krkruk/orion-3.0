@@ -5,7 +5,11 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serializer.Serdes;
+
+import java.util.Objects;
+import java.util.Queue;
 
 public abstract class OrionDeviceListener<Msg> implements SerialPortMessageListener {
     private static final Logger log = LoggerFactory.getLogger(OrionDeviceListener.class);
@@ -43,4 +47,30 @@ public abstract class OrionDeviceListener<Msg> implements SerialPortMessageListe
     }
 
     protected abstract void processMessage(final Msg incomingMessage);
+
+
+    public static class Builder<Msg> {
+        protected Serdes<Msg> serdes;
+        protected Queue<Msg> queue;
+
+        public Builder<Msg> withSerdes(Serdes<Msg> serdes) {
+            this.serdes = serdes;
+            return this;
+        }
+
+        public Builder<Msg> withQueue(Queue<Msg> queue) {
+            this.queue = queue;
+            return this;
+        }
+
+        public OrionDeviceListener<Msg> build() {
+            verify();
+            throw new UnsupportedOperationException("Listener builder hasn't been implemented");
+        }
+
+        protected void verify() {
+            Objects.requireNonNull(serdes, "Serdes required to deserialize incoming messages");
+            Objects.requireNonNull(queue, "Queue required to further process incoming data");
+        }
+    }
 }

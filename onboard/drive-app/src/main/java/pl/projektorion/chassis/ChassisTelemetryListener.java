@@ -28,24 +28,10 @@ public class ChassisTelemetryListener extends OrionDeviceListener<ChassisTelemet
         queue.add(incomingMessage);
     }
 
-
-    public static class Builder {
-        private Serdes<ChassisTelemetryMessage> serdes;
-        private Queue<ChassisTelemetryMessage> queue;
-
-        public Builder withSerdes(Serdes<ChassisTelemetryMessage> serdes) {
-            this.serdes = serdes;
-            return this;
-        }
-
-        public Builder withQueue(Queue<ChassisTelemetryMessage> queue) {
-            this.queue = queue;
-            return this;
-        }
-
-        public ChassisTelemetryListener build() {
-            Objects.requireNonNull(serdes, "Serdes required to deserialize incoming messages");
-            Objects.requireNonNull(queue, "Queue required to further process incoming data");
+    public static final class Builder extends OrionDeviceListener.Builder<ChassisTelemetryMessage> {
+        @Override
+        public OrionDeviceListener<ChassisTelemetryMessage> build() {
+            verify();
             return new ChassisTelemetryListener(serdes, queue);
         }
     }
