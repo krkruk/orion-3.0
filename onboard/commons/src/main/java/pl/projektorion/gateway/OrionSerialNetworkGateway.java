@@ -39,12 +39,11 @@ public class OrionSerialNetworkGateway<NetRx, SerialTx, SerialRx, NetTx> impleme
 
     @Override
     public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::cleanup));
         ioServices.submit(subscriber);
         ioServices.submit(publisher);
 
         device.run();
-        cleanup();
-        log.info("Shutdown complete.");
     }
 
     private void cleanup() {
@@ -52,6 +51,7 @@ public class OrionSerialNetworkGateway<NetRx, SerialTx, SerialRx, NetTx> impleme
         publisher.toggleStop();
         cleanup.run();
         ioServices.shutdown();
+        log.info("Shutdown complete");
     }
 
     public static class OrionSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> {
