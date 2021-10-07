@@ -2,11 +2,9 @@ package pl.projektorion.config.network.subscriber;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.config.ConfigUtils;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 public class SubscriberConfig {
     private static final Logger log = LoggerFactory.getLogger(SubscriberConfig.class);
@@ -40,7 +38,7 @@ public class SubscriberConfig {
     static SubscriberConfig build(Properties props) {
         Properties properties = new Properties();
         properties.putAll(props);
-        properties = stripPrefix(SubscriberConfigKeys.PREFIXED, properties);
+        properties = ConfigUtils.stripPrefix(SubscriberConfigKeys.PREFIXED, properties);
 
         log.info("Loaded Network Subscriber config = {}", properties);
         return new SubscriberConfig(properties);
@@ -54,21 +52,5 @@ public class SubscriberConfig {
                 ", readTimeout=" + getReadTimeout() +
                 ", topic=" + getTopic() +
                 '}';
-    }
-
-    private static Properties stripPrefix(final String prefix, final Properties properties) {
-        final List<String> prefixedProperties = properties.keySet().stream()
-                .map(Objects::toString)
-                .filter(k -> k.startsWith(prefix))
-                .collect(Collectors.toList());
-
-        final Properties result = new Properties();
-        for (String p : prefixedProperties) {
-            final String value = properties.getProperty(p);
-            final String key = p.replaceFirst(prefix, "");
-            result.put(key, value);
-        }
-
-        return result;
     }
 }
