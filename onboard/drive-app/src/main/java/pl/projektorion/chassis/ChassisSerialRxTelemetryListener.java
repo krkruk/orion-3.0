@@ -6,14 +6,13 @@ import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionDeviceListener;
 import pl.projektorion.serializer.Serdes;
 
-import java.util.Objects;
 import java.util.Queue;
 
-public class ChassisTelemetryListener extends OrionDeviceListener<ChassisTelemetryMessage> {
-    private static final Logger log = LoggerFactory.getLogger(ChassisTelemetryListener.class);
+public class ChassisSerialRxTelemetryListener extends OrionDeviceListener<ChassisTelemetryMessage> {
+    private static final Logger log = LoggerFactory.getLogger(ChassisSerialRxTelemetryListener.class);
     private final Queue<ChassisTelemetryMessage> queue;
 
-    ChassisTelemetryListener(Serdes<ChassisTelemetryMessage> serdes, Queue<ChassisTelemetryMessage> queue) {
+    ChassisSerialRxTelemetryListener(Serdes<ChassisTelemetryMessage> serdes, Queue<ChassisTelemetryMessage> queue) {
         super(serdes);
         this.queue = queue;
     }
@@ -32,7 +31,7 @@ public class ChassisTelemetryListener extends OrionDeviceListener<ChassisTelemet
         @Override
         public OrionDeviceListener<ChassisTelemetryMessage> build() {
             verify();
-            return new ChassisTelemetryListener(serdes, queue);
+            return new ChassisSerialRxTelemetryListener(serdes, queue);
         }
     }
 }

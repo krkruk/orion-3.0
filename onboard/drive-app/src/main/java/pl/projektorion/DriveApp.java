@@ -2,9 +2,9 @@ package pl.projektorion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.chassis.ChassisCommandMapperOpenLoop;
-import pl.projektorion.chassis.ChassisTelemetryListener;
-import pl.projektorion.chassis.ChassisTxTelemetryMapper;
+import pl.projektorion.chassis.ChassisSerialTxOpenLoopCommandMapper;
+import pl.projektorion.chassis.ChassisSerialRxTelemetryListener;
+import pl.projektorion.chassis.ChassisNetTxTelemetryMapper;
 import pl.projektorion.config.CommandLineParser;
 import pl.projektorion.config.network.publisher.PublisherConfig;
 import pl.projektorion.config.network.publisher.PublisherConfigLoader;
@@ -37,17 +37,17 @@ public class DriveApp {
                 .serial()
                     .withConfig(serialConfig)
                     .withSerdes(new OrionJsonSerdes<>(ChassisCommandMessageOpenLoop.class), new OrionJsonSerdes<>(ChassisTelemetryMessage.class))
-                    .withListenerBuilder(ChassisTelemetryListener.builder())
+                    .withListenerBuilder(ChassisSerialRxTelemetryListener.builder())
                     .apply()
                 .subscriber()
                     .withConfig(subscriberConfig)
                     .withSerdes(new OrionJsonSerdes<>(ChassisCommand.class))
-                    .withMapper(new ChassisCommandMapperOpenLoop())
+                    .withMapper(new ChassisSerialTxOpenLoopCommandMapper())
                     .apply()
                 .publisher()
                     .withConfig(publisherConfig)
                     .withSerdes(new OrionJsonSerdes<>(ChassisTelemetryMessage.class))
-                    .withMapper(new ChassisTxTelemetryMapper())
+                    .withMapper(new ChassisNetTxTelemetryMapper())
                     .apply()
                 .build()
                 .run();
