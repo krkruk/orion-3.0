@@ -1,61 +1,84 @@
 package pl.projektorion;
 
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.studiohartman.jamepad.ControllerAxis;
+import com.studiohartman.jamepad.ControllerIndex;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.hardware.controller.keyboard.WSADController;
-import pl.projektorion.hardware.controller.keyboard.WSADObserver;
-import pl.projektorion.network.NetworkPublisher;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.lang.reflect.Field;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class ControlApp {
     private static final Logger log = LoggerFactory.getLogger(ControlApp.class);
 
-    public ControlApp() {
-        helloWorldButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                System.exit(0);
-            }
-        });
-    }
+    private JPanel rootPanel;
+    private JPanel joystickPanel;
+    private JPanel telemetryPanel;
+    private JTextField joystickXValue;
+    private JTextField joystickYValue;
+    private JLabel joystickXLabel;
+    private JLabel joystickYLabel;
+    private JLabel inputLabel;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("ControlApp");
         final ControlApp app = new ControlApp();
-        frame.setContentPane(app.root);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setContentPane(app.rootPanel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-        frame.setSize(800, 600);
 
-        frame.setFocusable(true);
+        ControllerManager controllers = new ControllerManager();
+        controllers.initSDLGamepad();
+        Runtime.getRuntime().addShutdownHook(new Thread(controllers::quitSDLGamepad));
 
-        final ScheduledExecutorService activity = Executors.newSingleThreadScheduledExecutor();
-        WSADObserver observer = new WSADObserver(activity);
-        frame.addKeyListener(new WSADController(observer));
+        final Disposable subscribe = Observable.interval(500, TimeUnit.MILLISECONDS)
+                .map(t -> {
+                    controllers.update();
+                    final int count = controllers.getNumControllers();
+                    log.info("Detected {} controllers", count);
 
-        final ExecutorService networkThread = Executors.newSingleThreadExecutor();
-        final NetworkPublisher networkPublisher = new NetworkPublisher(observer);
-        networkThread.submit(networkPublisher);
+                    if (count > 0) {
+                        final ControllerIndex controllerIndex = controllers.getControllerIndex(0);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(activity::shutdown));
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            networkPublisher.toggleStopped();
-            networkThread.shutdown();
-        }));
+//                        final ControllerState state = controllers.getState(0);
+                        final float tLeft = controllerIndex.getAxisState(ControllerAxis.TRIGGERLEFT);
+                        final float tRight = controllerIndex.getAxisState(ControllerAxis.TRIGGERRIGHT);
+                        final float leftX = controllerIndex.getAxisState(ControllerAxis.LEFTX);
+                        final float leftY = controllerIndex.getAxisState(ControllerAxis.LEFTY);
+                        final float rightX = controllerIndex.getAxisState(ControllerAxis.RIGHTX);
+                        final float rightY = controllerIndex.getAxisState(ControllerAxis.RIGHTY);
+                        log.info("{}: {}-{}, {}-{}, {}-{}", controllerIndex.getName(), tLeft, tRight, leftX, leftY, rightX, rightY);
+                        final ControllerState state = controllers.getState(0);
+                        List<String> states = new ArrayList<>();
+                        for (Field f : ControllerState.class.getFields()) {
+                            final Object value = f.get(state);
+                            states.add(f.getName() + "=" + value);
+                        }
+                        log.info("States = {}", String.join(", ", states));
+
+                    }
+                    app.joystickXValue.setText(String.format("%d s", t));
+                    return t;
+                })
+                .subscribe();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(subscribe::dispose));
     }
 
-    private JPanel root;
-    private JButton helloWorldButton;
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -72,35 +95,34 @@ public class ControlApp {
      * @noinspection ALL
      */
     private void $$$setupUI$$$() {
-        root = new JPanel();
-        root.setLayout(new GridBagLayout());
-        final JPanel spacer1 = new JPanel();
-        GridBagConstraints gbc;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        root.add(spacer1, gbc);
-        final JPanel spacer2 = new JPanel();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        root.add(spacer2, gbc);
-        helloWorldButton = new JButton();
-        helloWorldButton.setText("Quit");
-        gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        root.add(helloWorldButton, gbc);
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        joystickPanel = new JPanel();
+        joystickPanel.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(joystickPanel, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(400, -1), null, null, 0, false));
+        joystickXLabel = new JLabel();
+        joystickXLabel.setText("X:");
+        joystickPanel.add(joystickXLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        joystickYLabel = new JLabel();
+        joystickYLabel.setText("Y:");
+        joystickPanel.add(joystickYLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        joystickXValue = new JTextField();
+        joystickPanel.add(joystickXValue, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        joystickYValue = new JTextField();
+        joystickPanel.add(joystickYValue, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        telemetryPanel = new JPanel();
+        telemetryPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(telemetryPanel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        inputLabel = new JLabel();
+        inputLabel.setText("Input");
+        rootPanel.add(inputLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
-        return root;
+        return rootPanel;
     }
 
 }

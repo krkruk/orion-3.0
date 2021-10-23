@@ -13,12 +13,10 @@ repositories {
 
 dependencies {
     implementation project(':commons')
+    implementation 'com.intellij:forms_rt:7.0.3'
 
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    implementation 'org.slf4j:slf4j-simple:1.7.30'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'com.github.WilliamAHartman:Jamepad:1.4.0'
+    implementation 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1+'
 }
 
 test {
