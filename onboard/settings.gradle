@@ -1,4 +1,0 @@
-rootProject.name = 'onboard.apps'
-
-include ':commons'
-include ':drive-app'

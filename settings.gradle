@@ -1,0 +1,5 @@
+rootProject.name = 'orion.apps'
+
+include ':commons'
+include ':onboard.drive'
+include ':groundcontrol.drive'
