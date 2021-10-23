@@ -1,4 +1,4 @@
-package pl.projektorion.schema.hardware.chassis;
+package pl.projektorion.schema.onboard;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

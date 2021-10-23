@@ -13,9 +13,9 @@ import pl.projektorion.config.network.subscriber.SubscriberConfigLoader;
 import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.config.serial.SerialConfigLoader;
 import pl.projektorion.gateway.OrionSerialNetworkGateway;
-import pl.projektorion.schema.ground.control.ChassisCommand;
-import pl.projektorion.schema.hardware.chassis.ChassisCommandMessageOpenLoop;
-import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
+import pl.projektorion.schema.groundcontrol.ChassisCommand;
+import pl.projektorion.schema.onboard.chassis.ChassisCommandMessageOpenLoop;
+import pl.projektorion.schema.onboard.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serial.OrionJsonSerdes;
 
 public class DriveApp {

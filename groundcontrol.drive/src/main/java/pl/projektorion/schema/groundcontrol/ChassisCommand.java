@@ -1,4 +1,4 @@
-package pl.projektorion.schema.ground.control;
+package pl.projektorion.schema.groundcontrol;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import pl.projektorion.schema.Twist;

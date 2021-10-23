@@ -5,7 +5,6 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
 import pl.projektorion.serializer.Serdes;
 
 import java.util.Objects;

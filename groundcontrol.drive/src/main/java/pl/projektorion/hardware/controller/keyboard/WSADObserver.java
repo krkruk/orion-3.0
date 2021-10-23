@@ -1,7 +1,7 @@
 package pl.projektorion.hardware.controller.keyboard;
 
 import pl.projektorion.schema.Twist;
-import pl.projektorion.schema.ground.control.ChassisCommand;
+import pl.projektorion.schema.groundcontrol.ChassisCommand;
 
 import java.time.Instant;
 import java.util.concurrent.ScheduledExecutorService;

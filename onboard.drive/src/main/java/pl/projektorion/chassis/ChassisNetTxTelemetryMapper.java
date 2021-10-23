@@ -1,7 +1,7 @@
 package pl.projektorion.chassis;
 
 import io.reactivex.rxjava3.functions.Function;
-import pl.projektorion.schema.hardware.chassis.ChassisTelemetryMessage;
+import pl.projektorion.schema.onboard.chassis.ChassisTelemetryMessage;
 
 public class ChassisNetTxTelemetryMapper implements Function<ChassisTelemetryMessage, ChassisTelemetryMessage> {
     @Override

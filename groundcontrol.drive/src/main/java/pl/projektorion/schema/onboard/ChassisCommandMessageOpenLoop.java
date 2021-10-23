@@ -1,18 +1,17 @@
-package pl.projektorion.schema.hardware.chassis;
-
+package pl.projektorion.schema.onboard;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChassisTelemetryMessage {
+public class ChassisCommandMessageOpenLoop {
 
     private int lPwm;
     private int rPwm;
 
-    public ChassisTelemetryMessage() {
+    public ChassisCommandMessageOpenLoop() {
     }
 
-    public ChassisTelemetryMessage(int lPwm, int rPwm) {
+    public ChassisCommandMessageOpenLoop(int lPwm, int rPwm) {
         this.lPwm = lPwm;
         this.rPwm = rPwm;
     }
@@ -35,7 +34,7 @@ public class ChassisTelemetryMessage {
 
     @Override
     public String toString() {
-        return "ChassisTelemetryMessage{" +
+        return "ChassisCommandMessage{" +
                 "lPwm=" + lPwm +
                 ", rPwm=" + rPwm +
                 '}';

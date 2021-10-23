@@ -1,8 +1,8 @@
 package pl.projektorion.chassis;
 
 import io.reactivex.rxjava3.functions.Function;
-import pl.projektorion.schema.ground.control.ChassisCommand;
-import pl.projektorion.schema.hardware.chassis.ChassisCommandMessageOpenLoop;
+import pl.projektorion.schema.groundcontrol.ChassisCommand;
+import pl.projektorion.schema.onboard.chassis.ChassisCommandMessageOpenLoop;
 
 public class ChassisSerialTxOpenLoopCommandMapper implements Function<ChassisCommand, ChassisCommandMessageOpenLoop> {
 
