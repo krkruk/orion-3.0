@@ -2,8 +2,6 @@ package pl.projektorion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.chassis.ChassisSerialTxMsgOpenLoopMapper;
-import pl.projektorion.chassis.ChassisNetTxTelemetryMapper;
 import pl.projektorion.config.CommandLineParser;
 import pl.projektorion.config.network.publisher.PublisherConfig;
 import pl.projektorion.config.network.publisher.PublisherConfigLoader;
@@ -12,13 +10,16 @@ import pl.projektorion.config.network.subscriber.SubscriberConfigLoader;
 import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.config.serial.SerialConfigLoader;
 import pl.projektorion.gateway.OrionSerialNetworkGateway;
-import pl.projektorion.schema.groundcontrol.chassis.ChassisCommand;
-import pl.projektorion.schema.onboard.chassis.ChassisSerialTxMsgOpenLoop;
-import pl.projektorion.schema.onboard.chassis.ChassisSerialRxTelemetryMsg;
+import pl.projektorion.manipulator.ManipulatorNetTxTelemetryMapper;
+import pl.projektorion.manipulator.ManipulatorSerialTxMsgOpenLoopMapper;
+import pl.projektorion.schema.groundcontrol.manipulator.ManipulatorCommand;
+import pl.projektorion.schema.groundcontrol.manipulator.ManipulatorTelemetry;
+import pl.projektorion.schema.onboard.manipulator.ManipulatorSerialRxTelemetryMsg;
+import pl.projektorion.schema.onboard.manipulator.ManipulatorSerialTxMsgOpenLoop;
 import pl.projektorion.serial.OrionJsonSerdes;
 
-public class DriveApp {
-    private static final Logger log = LoggerFactory.getLogger(DriveApp.class);
+public class ManipulatorApp {
+    private static final Logger log = LoggerFactory.getLogger(ManipulatorApp.class);
 
     public static void main(String[] args) throws Exception {
         final CommandLineParser cmdArgs = CommandLineParser.parse(args);
@@ -30,22 +31,22 @@ public class DriveApp {
         log.info("Publisher props = {}", publisherConfig);
 
         // Network Rx -> Serial Tx -> Serial Rx -> Network Tx
-        OrionSerialNetworkGateway.builder(ChassisCommand.class, ChassisSerialTxMsgOpenLoop.class,
-                        ChassisSerialRxTelemetryMsg.class, ChassisSerialRxTelemetryMsg.class)
+        OrionSerialNetworkGateway.builder(ManipulatorCommand.class, ManipulatorSerialTxMsgOpenLoop.class,
+                        ManipulatorSerialRxTelemetryMsg.class, ManipulatorTelemetry.class)
                 .basic()
                 .serial()
                     .withConfig(serialConfig)
-                    .withSerdes(new OrionJsonSerdes<>(ChassisSerialTxMsgOpenLoop.class), new OrionJsonSerdes<>(ChassisSerialRxTelemetryMsg.class))
+                    .withSerdes(new OrionJsonSerdes<>(ManipulatorSerialTxMsgOpenLoop.class), new OrionJsonSerdes<>(ManipulatorSerialRxTelemetryMsg.class))
                     .apply()
                 .subscriber()
                     .withConfig(subscriberConfig)
-                    .withSerdes(new OrionJsonSerdes<>(ChassisCommand.class))
-                    .withMapper(new ChassisSerialTxMsgOpenLoopMapper())
+                    .withSerdes(new OrionJsonSerdes<>(ManipulatorCommand.class))
+                    .withMapper(new ManipulatorSerialTxMsgOpenLoopMapper())
                     .apply()
                 .publisher()
                     .withConfig(publisherConfig)
-                    .withSerdes(new OrionJsonSerdes<>(ChassisSerialRxTelemetryMsg.class))
-                    .withMapper(new ChassisNetTxTelemetryMapper())
+                    .withSerdes(new OrionJsonSerdes<>(ManipulatorTelemetry.class))
+                    .withMapper(new ManipulatorNetTxTelemetryMapper())
                     .apply()
                 .build()
                 .run();

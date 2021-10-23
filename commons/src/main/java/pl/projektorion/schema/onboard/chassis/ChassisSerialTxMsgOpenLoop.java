@@ -4,17 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChassisCommandMessageOpenLoop {
+public class ChassisSerialTxMsgOpenLoop {
     @JsonProperty("X")
     private short speed;
 
     @JsonProperty("Y")
     private short angle;
 
-    public ChassisCommandMessageOpenLoop() {
+    public ChassisSerialTxMsgOpenLoop() {
     }
 
-    public ChassisCommandMessageOpenLoop(short speed, short angle) {
+    public ChassisSerialTxMsgOpenLoop(short speed, short angle) {
         this.speed = speed;
         this.angle = angle;
     }

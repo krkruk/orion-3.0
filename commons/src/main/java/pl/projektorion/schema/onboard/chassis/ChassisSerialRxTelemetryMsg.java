@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChassisTelemetryMessage {
+public class ChassisSerialRxTelemetryMsg {
     @JsonProperty("LF")
     private short leftFrontPwm;
 
@@ -24,10 +24,10 @@ public class ChassisTelemetryMessage {
     @JsonProperty("ErrorDescription")
     private String errorDescription;
 
-    public ChassisTelemetryMessage() {
+    public ChassisSerialRxTelemetryMsg() {
     }
 
-    public ChassisTelemetryMessage(short leftFrontPwm, short rightFrontPwm, short leftRearPwm, short rightRearPwm, short errorCode, String errorDescription) {
+    public ChassisSerialRxTelemetryMsg(short leftFrontPwm, short rightFrontPwm, short leftRearPwm, short rightRearPwm, short errorCode, String errorDescription) {
         this.leftFrontPwm = leftFrontPwm;
         this.rightFrontPwm = rightFrontPwm;
         this.leftRearPwm = leftRearPwm;

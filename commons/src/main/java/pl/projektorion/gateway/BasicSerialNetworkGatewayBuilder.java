@@ -12,6 +12,7 @@ import pl.projektorion.network.publisher.NetworkPublisher;
 import pl.projektorion.network.subscriber.NetworkSubscriber;
 import pl.projektorion.rx.utils.ObservableQueue;
 import pl.projektorion.serial.OrionDevice;
+import pl.projektorion.serial.OrionSerialDeviceListener;
 import pl.projektorion.utils.QueueFactory;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> 
                 .withSerialConfig(serial.getConfig())
                 .withCommandQueue(commandSender)
                 .withCommandSerdes(serial.getTxSerdes())
-                .withTelemetryListener(serial.getListenerBuilder()
+                .withTelemetryListener(OrionSerialDeviceListener.builder(serialRxClass)
                         .withSerdes(serial.getRxSerdes())
                         .withQueue(telemetryReceiver)
                         .build())

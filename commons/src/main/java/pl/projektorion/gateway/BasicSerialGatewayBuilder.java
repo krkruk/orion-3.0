@@ -3,7 +3,6 @@ package pl.projektorion.gateway;
 import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.gateway.serial.SerialApplyBuilderArg;
 import pl.projektorion.gateway.serial.SerialBuilderArgs;
-import pl.projektorion.gateway.serial.SerialListenerBuilderArg;
 import pl.projektorion.gateway.serial.SerialSerdesBuilderArg;
 import pl.projektorion.serial.OrionDeviceListener;
 import pl.projektorion.serializer.Serdes;
@@ -17,7 +16,6 @@ public class BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>
     private SerialConfig config;
     private Serdes<SerialTx> txSerdes;
     private Serdes<SerialRx> rxSerdes;
-    private OrionDeviceListener.Builder<SerialRx> listenerBuilder;
 
     public BasicSerialGatewayBuilder(SerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> rootBuilder) {
         this.rootBuilder = rootBuilder;
@@ -40,13 +38,7 @@ public class BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>
     }
 
     @Override
-    public SerialApplyBuilderArg<NetRx, SerialTx, SerialRx, NetTx> withListenerBuilder(OrionDeviceListener.Builder<SerialRx> builder) {
-        this.listenerBuilder = builder;
-        return this;
-    }
-
-    @Override
-    public SerialListenerBuilderArg<NetRx, SerialTx, SerialRx, NetTx> withSerdes(Serdes<SerialTx> tx, Serdes<SerialRx> rx) {
+    public SerialApplyBuilderArg<NetRx, SerialTx, SerialRx, NetTx> withSerdes(Serdes<SerialTx> tx, Serdes<SerialRx> rx) {
         this.txSerdes = tx;
         this.rxSerdes = rx;
         return this;
@@ -62,9 +54,5 @@ public class BasicSerialGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx>
 
     public Serdes<SerialRx> getRxSerdes() {
         return rxSerdes;
-    }
-
-    public OrionDeviceListener.Builder<SerialRx> getListenerBuilder() {
-        return listenerBuilder;
     }
 }
