@@ -1,7 +1,5 @@
 package pl.projektorion;
 
-import com.badlogic.gdx.controllers.Controller;
-import com.badlogic.gdx.controllers.Controllers;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.studiohartman.jamepad.ControllerAxis;
@@ -12,13 +10,18 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.gamepad.GamepadController;
+import pl.projektorion.gamepad.GamepadInput;
+import pl.projektorion.schema.Twist;
+import pl.projektorion.schema.groundcontrol.chassis.ChassisCommand;
+import pl.projektorion.utils.QueueFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class ControlApp {
@@ -41,42 +44,18 @@ public class ControlApp {
         frame.pack();
         frame.setVisible(true);
 
-        ControllerManager controllers = new ControllerManager();
-        controllers.initSDLGamepad();
-        Runtime.getRuntime().addShutdownHook(new Thread(controllers::quitSDLGamepad));
-
-        final Disposable subscribe = Observable.interval(500, TimeUnit.MILLISECONDS)
-                .map(t -> {
-                    controllers.update();
-                    final int count = controllers.getNumControllers();
-                    log.info("Detected {} controllers", count);
-
-                    if (count > 0) {
-                        final ControllerIndex controllerIndex = controllers.getControllerIndex(0);
-
-//                        final ControllerState state = controllers.getState(0);
-                        final float tLeft = controllerIndex.getAxisState(ControllerAxis.TRIGGERLEFT);
-                        final float tRight = controllerIndex.getAxisState(ControllerAxis.TRIGGERRIGHT);
-                        final float leftX = controllerIndex.getAxisState(ControllerAxis.LEFTX);
-                        final float leftY = controllerIndex.getAxisState(ControllerAxis.LEFTY);
-                        final float rightX = controllerIndex.getAxisState(ControllerAxis.RIGHTX);
-                        final float rightY = controllerIndex.getAxisState(ControllerAxis.RIGHTY);
-                        log.info("{}: {}-{}, {}-{}, {}-{}", controllerIndex.getName(), tLeft, tRight, leftX, leftY, rightX, rightY);
-                        final ControllerState state = controllers.getState(0);
-                        List<String> states = new ArrayList<>();
-                        for (Field f : ControllerState.class.getFields()) {
-                            final Object value = f.get(state);
-                            states.add(f.getName() + "=" + value);
-                        }
-                        log.info("States = {}", String.join(", ", states));
-
-                    }
-                    app.joystickXValue.setText(String.format("%d s", t));
-                    return t;
+        final BlockingQueue<ChassisCommand> senderQueue = QueueFactory.createSenderQueue();
+        GamepadInput.builder(ChassisCommand.class)
+                .withUpdateInterval(100, TimeUnit.MILLISECONDS)
+                .withMapper(state -> {
+                        final float x = state.leftStickX;
+                        final float y = state.leftStickY;
+                        log.info("{}: is connected={}, x={} y={}", state.controllerType, state.isConnected, x, y);
+                        return new ChassisCommand(new Twist(x, y));
                 })
-                .subscribe();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(subscribe::dispose));
+                .withSinkQueue(senderQueue)
+                .build()
+                .run();
     }
 
 
