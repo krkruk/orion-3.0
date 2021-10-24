@@ -2,7 +2,6 @@ package pl.projektorion.serial;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.projektorion.schema.onboard.chassis.ChassisSerialRxTelemetryMsg;
 import pl.projektorion.serializer.Serdes;
 
 import java.util.Queue;

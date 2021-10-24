@@ -2,29 +2,33 @@ package pl.projektorion;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import io.reactivex.rxjava3.disposables.Disposable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pl.projektorion.backend.GamepadToNetwork;
+import pl.projektorion.backend.GamepadToSerial;
 import pl.projektorion.config.CommandLineParser;
 import pl.projektorion.config.network.publisher.PublisherConfig;
 import pl.projektorion.config.network.publisher.PublisherConfigLoader;
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
 import pl.projektorion.config.network.subscriber.SubscriberConfigLoader;
-import pl.projektorion.gamepad.GamepadController;
-import pl.projektorion.gamepad.GamepadInput;
-import pl.projektorion.network.Network;
-import pl.projektorion.network.publisher.NetworkPublisher;
-import pl.projektorion.network.subscriber.NetworkSubscriber;
-import pl.projektorion.rx.utils.ObservableQueue;
+import pl.projektorion.config.serial.SerialConfig;
+import pl.projektorion.config.serial.SerialConfigLoader;
 import pl.projektorion.schema.groundcontrol.chassis.ChassisCommand;
 import pl.projektorion.schema.groundcontrol.chassis.ChassisTelemetry;
-import pl.projektorion.serial.OrionJsonSerdes;
-import pl.projektorion.utils.QueueFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.Properties;
 
+/**
+ * Command line arguments (default):
+ *  * to run as a network app use this argument:
+ *    -global.config=orion.properties
+ *
+ *  * to run as a serial app use this argument:
+ *    -global.config=orion.serial.properties
+ */
 public class ControlApp {
     private static final Logger log = LoggerFactory.getLogger(ControlApp.class);
 
@@ -53,57 +57,38 @@ public class ControlApp {
     private JTextField errorCodeValue;
 
     public static void main(String[] args) {
-        final CommandLineParser cmd = CommandLineParser.parse(args);
-        final PublisherConfig publisherConfig = PublisherConfigLoader.get(cmd);
-        final SubscriberConfig subscriberConfig = SubscriberConfigLoader.get(cmd);
-
-        JFrame frame = new JFrame("ControlApp");
+                JFrame frame = new JFrame("ControlApp");
         final ControlApp app = new ControlApp();
         frame.setContentPane(app.rootPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
 
-        final ExecutorService executorService = Executors.newFixedThreadPool(2);
-        final BlockingQueue<ChassisCommand> senderQueue = QueueFactory.createSenderQueue();
-        final ObservableQueue<ChassisTelemetry> receiverQueue = QueueFactory.createReceiverQueue();
+        final CommandLineParser cmd = CommandLineParser.parse(args);
+        log.info("Command line arguments = {}", cmd);
+        final Properties mode = cmd.getConfigByPrefix("mode");
+        Runnable backend = null;
 
-        GamepadInput.builder(ChassisCommand.class)
-                .withUpdateInterval(20, TimeUnit.MILLISECONDS)
-                .withMapper(state -> {
-                    final float x = state.leftStickX;
-                    final float y = state.leftStickY;
-                    return new ChassisCommand(x, y);
-                })
-                .withSinkQueue(senderQueue)
-                .withController(0)
-                .withPeek(app::setChassisCommandValue)
-                .build()
-                .run();
+        switch (mode.get("mode.config").toString()) {
+            case "serial": {
+                final SerialConfig serialConfig = SerialConfigLoader.get(cmd);
+                backend = new GamepadToSerial(serialConfig,
+                        app::setChassisCommandValue, app::setTelemetry);
+                break;
+            }
+            case "network":
+            default: {
+                final PublisherConfig publisherConfig = PublisherConfigLoader.get(cmd);
+                final SubscriberConfig subscriberConfig = SubscriberConfigLoader.get(cmd);
+                backend = new GamepadToNetwork(
+                        publisherConfig, subscriberConfig,
+                        app::setChassisCommandValue, app::setTelemetry);
+                break;
+            }
+        }
 
-        final NetworkPublisher<ChassisCommand> publisher = Network.publisher(ChassisCommand.class)
-                .withConfig(publisherConfig)
-                .withSerdes(new OrionJsonSerdes<>(ChassisCommand.class))
-                .withQueue(senderQueue)
-                .build();
-
-        final NetworkSubscriber<ChassisTelemetry> subscriber = Network.subscriber(ChassisTelemetry.class)
-                .withConfig(subscriberConfig)
-                .withSerdes(new OrionJsonSerdes<>(ChassisTelemetry.class))
-                .withQueue(receiverQueue)
-                .build();
-
-        final Disposable uiTelemetryReceiver = receiverQueue.observe()
-                .subscribe(app::setTelemetry);
-
-        executorService.submit(publisher);
-        executorService.submit(subscriber);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            publisher.toggleStop();
-            subscriber.toggleStop();
-            uiTelemetryReceiver.dispose();
-            executorService.shutdown();
-        }));
+        Objects.requireNonNull(backend, "You must either select 'serial' or 'network' backend!");
+        backend.run();
     }
 
     public void setChassisCommandValue(String controllerName, ChassisCommand value) {
