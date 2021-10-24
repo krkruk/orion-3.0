@@ -1,35 +1,39 @@
 package pl.projektorion.schema.groundcontrol.chassis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import pl.projektorion.schema.Twist;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChassisCommand {
 
-    private float xAxis;
-    private float yAxis;
+    @JsonProperty("joystickX")
+    private double xAxis;
+
+    @JsonProperty("joystickY")
+    private double yAxis;
 
     public ChassisCommand() {
     }
 
-    public ChassisCommand(float xAxis, float yAxis) {
+    public ChassisCommand(double xAxis, double yAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
     }
 
-    public float getXAxis() {
+    public double getXAxis() {
         return xAxis;
     }
 
-    public void setxAxis(float xAxis) {
+    public void setxAxis(double xAxis) {
         this.xAxis = xAxis;
     }
 
-    public float getYAxis() {
+    public double getYAxis() {
         return yAxis;
     }
 
-    public void setyAxis(float yAxis) {
+    public void setyAxis(double yAxis) {
         this.yAxis = yAxis;
     }
 

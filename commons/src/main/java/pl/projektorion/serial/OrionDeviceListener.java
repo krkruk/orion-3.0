@@ -41,7 +41,7 @@ public abstract class OrionDeviceListener<Msg> implements SerialPortMessageListe
             final Msg message = serdes.deserialize(line);
             processMessage(message);
         } catch (Exception e) {
-            log.error("Could not parse incoming message because of {}", e.getMessage());
+            log.error("Could not parse incoming message because of: {}", e.getMessage());
         }
     }
 

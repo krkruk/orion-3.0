@@ -3,6 +3,8 @@ package pl.projektorion.backend;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.BiConsumer;
 import io.reactivex.rxjava3.functions.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.projektorion.config.network.publisher.PublisherConfig;
 import pl.projektorion.config.network.subscriber.SubscriberConfig;
 import pl.projektorion.gamepad.GamepadInput;
@@ -23,6 +25,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class GamepadToNetwork implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(GamepadToNetwork.class);
     private final static int IO_THREADS = 2;
 
     private final ExecutorService executor;
