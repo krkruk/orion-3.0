@@ -6,28 +6,38 @@ import pl.projektorion.schema.Twist;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChassisCommand {
 
-    private Twist twist;
+    private float xAxis;
+    private float yAxis;
 
     public ChassisCommand() {
     }
 
-    public ChassisCommand(Twist twist) {
-        this.twist = twist;
+    public ChassisCommand(float xAxis, float yAxis) {
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
     }
 
-    public Twist getTwist() {
-        return twist;
+    public float getXAxis() {
+        return xAxis;
     }
 
-    public void setTwist(Twist twist) {
-        this.twist = twist;
+    public void setxAxis(float xAxis) {
+        this.xAxis = xAxis;
+    }
+
+    public float getYAxis() {
+        return yAxis;
+    }
+
+    public void setyAxis(float yAxis) {
+        this.yAxis = yAxis;
     }
 
     @Override
     public String toString() {
         return "ChassisCommand{" +
-                "twist=" + twist +
+                "xAxis=" + xAxis +
+                ", yAxis=" + yAxis +
                 '}';
     }
-
 }

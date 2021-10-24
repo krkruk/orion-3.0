@@ -1,11 +1,21 @@
 package pl.projektorion.chassis;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.reactivex.rxjava3.functions.Function;
+import pl.projektorion.schema.groundcontrol.chassis.ChassisTelemetry;
 import pl.projektorion.schema.onboard.chassis.ChassisSerialRxTelemetryMsg;
 
-public class ChassisNetTxTelemetryMapper implements Function<ChassisSerialRxTelemetryMsg, ChassisSerialRxTelemetryMsg> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ChassisNetTxTelemetryMapper implements Function<ChassisSerialRxTelemetryMsg, ChassisTelemetry> {
     @Override
-    public ChassisSerialRxTelemetryMsg apply(ChassisSerialRxTelemetryMsg chassisTelemetryMessage) throws Throwable {
-        return chassisTelemetryMessage;
+    public ChassisTelemetry apply(ChassisSerialRxTelemetryMsg msg) throws Throwable {
+        return new ChassisTelemetry(
+                msg.getLeftFrontPwm(),
+                msg.getRightFrontPwm(),
+                msg.getLeftRearPwm(),
+                msg.getRightRearPwm(),
+                msg.getErrorCode(),
+                msg.getErrorDescription()
+        );
     }
 }

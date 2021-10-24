@@ -2,6 +2,8 @@ package pl.projektorion.gamepad;
 
 import com.studiohartman.jamepad.ControllerIndex;
 import com.studiohartman.jamepad.ControllerState;
+import io.reactivex.rxjava3.functions.BiConsumer;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 
 import java.util.Objects;
@@ -14,6 +16,7 @@ public class GamepadInputBuilder<T> {
     private TimeUnit unit;
     private int controllerIndex;
     private Function<ControllerState, T> mapper;
+    private BiConsumer<String, T> peekFunction;
     private BlockingQueue<T> queue;
 
     GamepadInputBuilder(Class<T> clazz) {
@@ -35,6 +38,12 @@ public class GamepadInputBuilder<T> {
         this.mapper = mapper;
         return this;
     }
+
+    public GamepadInputBuilder<T> withPeek(BiConsumer<String, T> peekFunction) {
+        this.peekFunction = peekFunction;
+        return this;
+    }
+
     public GamepadInputBuilder<T> withSinkQueue(BlockingQueue<T> queue) {
         this.queue = queue;
         return this;
@@ -46,6 +55,6 @@ public class GamepadInputBuilder<T> {
         Objects.requireNonNull(mapper, "Gamepad Mapper function must be provided");
         Objects.requireNonNull(queue, "Sink queue cannot be null");
 
-        return new GamepadInput<>(time, unit, controllerIndex, mapper, queue);
+        return new GamepadInput<>(time, unit, controllerIndex, mapper, peekFunction, queue);
     }
 }

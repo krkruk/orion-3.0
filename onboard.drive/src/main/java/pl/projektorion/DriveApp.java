@@ -13,6 +13,7 @@ import pl.projektorion.config.serial.SerialConfig;
 import pl.projektorion.config.serial.SerialConfigLoader;
 import pl.projektorion.gateway.OrionSerialNetworkGateway;
 import pl.projektorion.schema.groundcontrol.chassis.ChassisCommand;
+import pl.projektorion.schema.groundcontrol.chassis.ChassisTelemetry;
 import pl.projektorion.schema.onboard.chassis.ChassisSerialTxMsgOpenLoop;
 import pl.projektorion.schema.onboard.chassis.ChassisSerialRxTelemetryMsg;
 import pl.projektorion.serial.OrionJsonSerdes;
@@ -31,7 +32,7 @@ public class DriveApp {
 
         // Network Rx -> Serial Tx -> Serial Rx -> Network Tx
         OrionSerialNetworkGateway.builder(ChassisCommand.class, ChassisSerialTxMsgOpenLoop.class,
-                        ChassisSerialRxTelemetryMsg.class, ChassisSerialRxTelemetryMsg.class)
+                        ChassisSerialRxTelemetryMsg.class, ChassisTelemetry.class)
                 .basic()
                 .serial()
                     .withConfig(serialConfig)
@@ -44,7 +45,7 @@ public class DriveApp {
                     .apply()
                 .publisher()
                     .withConfig(publisherConfig)
-                    .withSerdes(new OrionJsonSerdes<>(ChassisSerialRxTelemetryMsg.class))
+                    .withSerdes(new OrionJsonSerdes<>(ChassisTelemetry.class))
                     .withMapper(new ChassisNetTxTelemetryMapper())
                     .apply()
                 .build()

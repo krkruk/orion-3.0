@@ -96,7 +96,7 @@ public class BasicSerialNetworkGatewayBuilder<NetRx, SerialTx, SerialRx, NetTx> 
 
     private void connectPipelines() {
         final ConnectableObservable<SerialRx> publisherObservable = telemetryReceiver.observe().publish();
-        disposables.add(publisherObservable.subscribe(e -> log.info("Received telemetry from the uC: {}", e.toString())));
+        disposables.add(publisherObservable.subscribe(e -> log.debug("Received telemetry from the uC: {}", e.toString())));
 
         disposables.add(publisherObservable
                 .map(pub.getMapper())
